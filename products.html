@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Products</title>
+
+<style>
+/* SAME THEME */
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI';background:#0f172a;color:#f1f5f9;}
+header{background:#020617;display:flex;justify-content:space-between;padding:15px 40px;}
+header h2{color:#facc15;}
+nav a{color:#e2e8f0;margin-left:20px;text-decoration:none;}
+nav a:hover{color:#facc15;}
+
+.container{padding:40px;}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;}
+
+.card{background:#1e293b;padding:20px;border-radius:15px;}
+.price{color:#facc15;}
+button{width:100%;padding:10px;background:#facc15;border:none;border-radius:8px;}
+</style>
+
+</head>
+<body>
+
+<header>
+<h2>KhozaMarket</h2>
+<nav>
+<a href="index.html">Home</a>
+<a href="cart.html">Cart</a>
+</nav>
+</header>
+
+<div class="container">
+<h1>All Products</h1>
+
+<div class="products">
+
+<div class="card">
+<h3>Laptop</h3>
+<p class="price">R5500</p>
+<p>Seller: Thabo</p>
+<a href="product.html"><button>View</button></a>
+</div>
+
+<div class="card">
+<h3>Headphones</h3>
+<p class="price">R350</p>
+<p>Seller: Sarah</p>
+<a href="product.html"><button>View</button></a>
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
