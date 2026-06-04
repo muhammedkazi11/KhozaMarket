@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>User Management</title>
+
+<style>
+body{background:#0f172a;color:white;font-family:'Segoe UI';padding:40px;}
+h1{color:#facc15;}
+table{width:100%;border-collapse:collapse;margin-bottom:20px;}
+th,td{padding:10px;border-bottom:1px solid #333;}
+th{color:#facc15;}
+
+button{
+    padding:6px 10px;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+.add{background:#22c55e;color:white;}
+.edit{background:#3b82f6;color:white;}
+.delete{background:#ef4444;color:white;}
+</style>
+
+</head>
+<body>
+
+<h1>User Management</h1>
+
+<button class="add">Add New User</button>
+
+<table>
+<tr>
+<th>ID</th><th>Name</th><th>Email</th><th>Role</th><th>Actions</th>
+</tr>
+
+<tr>
+<td>1</td><td>Thabo</td><td>thabo@mail.com</td><td>Seller</td>
+<td>
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+</td>
+</tr>
+
+<tr>
+<td>2</td><td>Sarah</td><td>sarah@mail.com</td><td>Buyer</td>
+<td>
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+</td>
+</tr>
+
+<tr>
+<td>3</td><td>Admin</td><td>admin@mail.com</td><td>Admin</td>
+<td>
+<button class="edit">Edit</button>
+<button class="delete">Delete</button>
+</td>
+</tr>
+
+</table>
+
+<a href="admin.html"><button>Back</button></a>
+
+</body>
+</html>
