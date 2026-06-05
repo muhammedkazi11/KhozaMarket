@@ -1,31 +1,141 @@
-<!DOCTYPE html><!DOCTYPE="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Product</title>
+<title>Product Details</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{margin:0;padding:0;}
-body{font-family:'Segoe UI';background:#0f172a;color:#fff;}
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 40px;
+}
 
-header{background:#020617;padding:15px 40px;color:#facc15;}
+.container {
+    max-width: 600px;
+    margin: auto;
+}
 
-.container{padding:40px;}
-button{padding:12px;background:#facc15;border:none;border-radius:8px;}
+.card {
+    background: #1e293b;
+    padding: 25px;
+    border-radius: 15px;
+}
+
+.price {
+    color: #facc15;
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.desc {
+    margin-bottom: 15px;
+    color: #94a3b8;
+}
+
+button {
+    padding: 10px;
+    width: 100%;
+    margin-top: 10px;
+    background: #facc15;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
 </style>
-
 </head>
+
 <body>
 
-<header>khozamarket</header>
-
 <div class="container">
-<h1>Laptop</h1>
-<p>Price: R5500</p>
-<p>Seller: Thabo</p>
-<p>Description: Powerful laptop for work & gaming</p>
-
-<button onclick="alert('Added to cart')">Add to Cart</button>
+    <div id="product">Loading...</div>
 </div>
+
+<script>
+// ✅ Supabase
+const SUPABASE_URL = "https://lyvtjcnzeihsqvpzkced.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5dnRqY256ZWloc3F2cHprY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjAxODAsImV4cCI6MjA5NjEzNjE4MH0.YcMI_AKjUczeecLQcNq6OyPcfxOe7Z21hvacVW6qTfM";
+
+const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+// ✅ LOAD PRODUCT
+async function loadProduct() {
+
+    const params = new URLSearchParams(window.location.search);
+    let id = parseInt(params.get("id"));
+
+    if (!id) {
+        document.getElementById("product").innerHTML = "Invalid product ID";
+        return;
+    }
+
+    const { data, error } = await client
+        .from('products')
+        .select('*')
+        .eq('id', id);
+
+    const container = document.getElementById("product");
+
+    if (error || !data || data.length === 0) {
+        container.innerHTML = "<p>❌ Product not found</p>";
+        return;
+    }
+
+    const p = data[0];
+
+    container.innerHTML = `
+        <div class="card">
+            <h1>${p.name}</h1>
+            <p class="price">R${p.price}</p>
+            <p class="desc">${p.description || "No description available"}</p>
+            <p>Seller: ${p.seller_name}</p>
+
+            <button onclick='addToCart(${p.id}, ${JSON.stringify(p.name)}, ${p.price})'>
+                Add to Cart
+            </button>
+
+            <a href="index.html"><button>Back to Home</button></a>
+        </div>
+    `;
+}
+
+// ✅ ✅ FIXED ADD TO CART + REDIRECT TO CART PAGE
+function addToCart(id, name, price) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const existingItem = cart.find(item => item.id === id);
+
+    if (existingItem) {
+        // ✅ Already exists → just go to cart
+        window.location.href = "cart.html";
+        return;
+    }
+
+    cart.push({ id, name, price });
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    console.log("UPDATED CART:", cart);
+
+    // ✅ INSTANT REDIRECT TO CART
+    window.location.href = "cart.html";
+}
+
+// ✅ BUY NOW (future)
+function buyNow(id) {
+    alert("🚀 Checkout coming next");
+}
+
+loadProduct();
+</script>
 
 </body>
 </html>
