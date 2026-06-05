@@ -1,27 +1,223 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Cart</title>
+<meta charset="UTF-8">
+<title>Cart | khozamarket</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-body{background:#0f172a;color:white;font-family:'Segoe UI';}
-.container{padding:40px;}
-button{padding:10px;background:#facc15;border:none;}
-</style>
+body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #0f172a;
+    color: #f1f5f9;
+    padding: 40px;
+}
 
+.container {
+    max-width: 700px;
+    margin: auto;
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+.cart-item {
+    background: #1e293b;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.price {
+    color: #facc15;
+    font-weight: bold;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    background: #facc15;
+    color: #020617;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #eab308;
+}
+
+.total {
+    font-size: 20px;
+    margin-top: 20px;
+}
+
+.empty {
+    color: #94a3b8;
+}
+
+.checkout-btn {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.back-btn {
+    width: 100%;
+    margin-top: 10px;
+    background: #334155;
+    color: white;
+}
+</style>
 </head>
+
 <body>
 
 <div class="container">
-<h1>Your Cart</h1>
+    <h1>Your Cart</h1>
 
-<p>Laptop - R5500</p>
-<p>Headphones - R350</p>
+    <div id="cart-items"></div>
 
-<h3>Total: R5850</h3>
+    <div id="total"></div>
 
-<button>Checkout</button>
+    <button class="checkout-btn" onclick="checkout()">
+        Checkout
+    </button>
+
+    <button class="back-btn" onclick="goBack()">
+        Continue Shopping
+    </button>
 </div>
+
+<script>
+
+// ✅ Supabase
+const SUPABASE_URL = "https://lyvtjcnzeihsqvpzkced.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5dnRqY256ZWloc3F2cHprY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjAxODAsImV4cCI6MjA5NjEzNjE4MH0.YcMI_AKjUczeecLQcNq6OyPcfxOe7Z21hvacVW6qTfM";
+
+const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+// ✅ LOAD CART
+function loadCart() {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    const container = document.getElementById("cart-items");
+    const totalDiv = document.getElementById("total");
+
+    container.innerHTML = "";
+
+    if (cart.length === 0) {
+        container.innerHTML = "<p class='empty'>Your cart is empty</p>";
+        totalDiv.innerHTML = "";
+        return;
+    }
+
+    let total = 0;
+
+    cart.forEach((item, index) => {
+        total += item.price;
+
+        container.innerHTML += `
+            <div class="cart-item">
+                <h3>${item.name}</h3>
+                <p class="price">R${item.price}</p>
+                <button onclick="removeItem(${index})">Remove</button>
+            </div>
+        `;
+    });
+
+    totalDiv.innerHTML = `<p class="total">Total: R${total}</p>`;
+}
+
+// ✅ REMOVE ITEM
+function removeItem(index) {
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+
+    cart.splice(index, 1);
+
+    localStorage.setItem("cart", JSON.stringify(cart));
+
+    loadCart();
+}
+
+// ✅ CHECKOUT (NO LOGIN REQUIRED)
+async function checkout() {
+
+    let cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    if (cart.length === 0) {
+        alert("Cart is empty");
+        return;
+    }
+
+    // ✅ Calculate total
+    const total = cart.reduce((sum, item) => sum + Number(item.price), 0);
+
+    console.log("CHECKOUT CART:", cart);
+    console.log("TOTAL:", total);
+
+    // ✅ STEP 1: Create order
+    const { data: order, error: orderError } = await client
+        .from('orders')
+        .insert([{
+            total: total,
+            status: "pending"
+        }])
+        .select()
+        .single();
+
+    if (orderError) {
+        console.error("ORDER ERROR:", orderError);
+        alert("❌ Failed to create order: " + orderError.message);
+        return;
+    }
+
+    console.log("ORDER CREATED:", order);
+
+    // ✅ STEP 2: Insert order items
+    const items = cart.map(item => ({
+        order_id: order.id,
+        product_id: item.id,
+        name: item.name,
+        price: item.price
+    }));
+
+    const { error: itemsError } = await client
+        .from('order_items')
+        .insert(items);
+
+    if (itemsError) {
+        console.error("ITEM ERROR:", itemsError);
+        alert("❌ Failed to save items: " + itemsError.message);
+        return;
+    }
+
+    console.log("ITEMS SAVED");
+
+    // ✅ STEP 3: Clear cart
+    localStorage.removeItem("cart");
+
+    alert("✅ Order placed successfully!");
+
+    // ✅ STEP 4: Redirect
+    window.location.href = "index.html";
+}
+// ✅ BACK TO SHOP
+function goBack() {
+    window.location.href = "index.html";
+}
+
+// ✅ INIT
+loadCart();
+
+</script>
 
 </body>
 </html>
