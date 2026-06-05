@@ -1,27 +1,45 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Register</title>
+<head><title>Register</title></head>
+<body style="background:#0f172a;color:white;font-family:Segoe UI">
 
-<style>
-body{background:#0f172a;color:white;font-family:'Segoe UI';}
-.container{padding:40px;}
-input{display:block;margin:10px 0;padding:10px;width:100%;}
-button{background:#facc15;padding:10px;border:none;}
-</style>
+<h1>Register</h1>
 
-</head>
-<body>
+<input id="name" placeholder="Name"><br><br>
+<input id="email" placeholder="Email"><br><br>
+<input id="password" type="password"><br><br>
 
-<div class="container">
-<h1>Create Account</h1>
+<button onclick="register()">Register</button>
 
-<input placeholder="Full Name">
-<input placeholder="Email">
-<input type="password" placeholder="Password">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<button>Register</button>
-</div>
+<script>
+const supabase = supabase.createClient(
+"https://lyvtjcnzeihsqvpzkced.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5dnRqY256ZWloc3F2cHprY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjAxODAsImV4cCI6MjA5NjEzNjE4MH0.YcMI_AKjUczeecLQcNq6OyPcfxOe7Z21hvacVW6qTfM"
+);
+
+async function register(){
+
+const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
+
+const {data,error}=await supabase.auth.signUp({email,password});
+
+if(error) return alert(error.message);
+
+await supabase.from('profiles').insert([{
+id:data.user.id,
+full_name:name,
+email:email
+}]);
+
+alert("Registered!");
+location.href="login.html";
+
+}
+</script>
 
 </body>
 </html>
