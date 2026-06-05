@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-><head>
+<head>
 
 <style>
 body{font-family:'Segoe UI';background:#0f172a;color:#fff;margin:0;}
@@ -35,17 +35,17 @@ button{
 
 <div class="cards">
 <div class="card">
-<h2>120</h2>
+<h2 id="userCount">0</h2>
 <p>Total Users</p>
 </div>
 
 <div class="card">
-<h2>85</h2>
+<h2 id="orderCount">0</h2>
 <p>Total Orders</p>
 </div>
 
 <div class="card">
-<h2>240</h2>
+<h2 id="productCount">0</h2>
 <p>Products</p>
 </div>
 </div>
@@ -53,13 +53,74 @@ button{
 <h2>Management</h2>
 
 <a href="users.html"><button>User Management</button></a>
+<a href="sell.html"><button>Create a new Product to sell</button></a>
 <a href="products-admin.html"><button>Product Management</button></a>
 <a href="orders.html"><button>Order Monitoring</button></a>
 
 <br><br>
-<a href="index.html"><button style="background:#334155;color:white;">Back to Site</button></a>
+<a href="index.html">
+<button style="background:#334155;color:white;">Back to Site</button>
+</a>
 
 </div>
+
+<!-- ✅ CORRECT SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<script>
+
+const SUPABASE_URL = "https://lyvtjcnzeihsqvpzkced.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imx5dnRqY256ZWloc3F2cHprY2VkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA1NjAxODAsImV4cCI6MjA5NjEzNjE4MH0.YcMI_AKjUczeecLQcNq6OyPcfxOe7Z21hvacVW6qTfM";
+
+const client = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
+
+// ✅ LOAD STATS (FIXED)
+async function loadStats() {
+
+    console.log("Loading dashboard stats...");
+
+    try {
+
+        // ✅ USERS
+        const { count: usersCount, error: userError } = await client
+            .from('profiles')
+            .select('*', { count: 'exact', head: true });
+
+        console.log("Users:", usersCount, userError);
+
+        // ✅ ORDERS
+        const { count: ordersCount, error: orderError } = await client
+            .from('orders')
+            .select('*', { count: 'exact', head: true });
+
+        console.log("Orders:", ordersCount, orderError);
+
+        // ✅ PRODUCTS
+        const { count: productsCount, error: productError } = await client
+            .from('products')
+            .select('*', { count: 'exact', head: true });
+
+        console.log("Products:", productsCount, productError);
+
+        document.getElementById("userCount").innerText = usersCount ?? 0;
+        document.getElementById("orderCount").innerText = ordersCount ?? 0;
+        document.getElementById("productCount").innerText = productsCount ?? 0;
+
+    } catch (err) {
+        console.error("Dashboard error:", err);
+    }
+}
+
+// ✅ INIT
+loadStats();
+
+
+
+</script>
 
 </body>
 </html>
